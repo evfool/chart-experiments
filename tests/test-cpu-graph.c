@@ -14,11 +14,13 @@ int
 main (int argc,
       char *argv[])
 {
-  guint samples = 2;
-  guint seconds = 30;
+  guint samples = 1;
+  guint seconds = 60;
+  guint runfor = 60;
   const GOptionEntry entries[] = {
     { "samples", 'm', 0, G_OPTION_ARG_INT, &samples, "Number of samples per second", "2" },
     { "seconds", 's', 0, G_OPTION_ARG_INT, &seconds, "Number of seconds to display", "60" },
+    { "run-for", 'r', 0, G_OPTION_ARG_INT, &runfor, "Number of seconds to run", "60" },
     { NULL }
   };
   gint64 timespan;
@@ -40,8 +42,8 @@ main (int argc,
       return EXIT_FAILURE;
     }
 
-  g_print ("%d samples per second over %d seconds.\n",
-           samples, seconds);
+  g_print ("%d samples per second over %d seconds running for %d seconds.\n",
+           samples, seconds, runfor);
 
   timespan = (gint64)seconds * G_USEC_PER_SEC;
   max_samples = seconds * samples;
@@ -52,8 +54,8 @@ main (int argc,
   g_object_unref (provider);
 
   window = g_object_new (GTK_TYPE_WINDOW,
-                         "default-width", 600,
-                         "default-height", 325,
+                         "default-width", 1200,
+                         "default-height", 650,
                          "title", "CPU Graph",
                          NULL);
 
@@ -76,6 +78,7 @@ main (int argc,
     }
 
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
+  g_timeout_add_seconds (60, (GSourceFunc)gtk_main_quit, NULL);
   gtk_window_present (window);
   gtk_main ();
 
