@@ -1,5 +1,7 @@
 #include "rg-graph.h"
 #include "rg-cpu-graph.h"
+#include "rg-line-renderer.h"
+#include "rg-straight-renderer.h"
 
 #include <stdlib.h>
 
@@ -73,6 +75,7 @@ main (int argc,
                             "vexpand", TRUE,
                             "timespan", timespan,
                             "max-samples", max_samples,
+                            "renderer", ((i%2))==0 ? RG_TYPE_LINE_RENDERER : RG_TYPE_STRAIGHT_RENDERER,
                             NULL);
       gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (graph));
     }

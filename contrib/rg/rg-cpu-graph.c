@@ -28,6 +28,7 @@ struct _RgCpuGraph
 
   gint64 timespan;
   guint  max_samples;
+  GType  renderer;
 };
 
 G_DEFINE_TYPE (RgCpuGraph, rg_cpu_graph, RG_TYPE_GRAPH)
@@ -36,6 +37,7 @@ enum {
   PROP_0,
   PROP_MAX_SAMPLES,
   PROP_TIMESPAN,
+  PROP_RENDERER,
   LAST_PROP
 };
 
@@ -93,7 +95,7 @@ rg_cpu_graph_constructed (GObject *object)
     {
       RgRenderer *renderer;
 
-      renderer = g_object_new (RG_TYPE_LINE_RENDERER,
+      renderer = g_object_new (self->renderer,
                                "column", i,
                                "stroke-color", colors [i % G_N_ELEMENTS (colors)],
                                NULL);
@@ -120,6 +122,10 @@ rg_cpu_graph_get_property (GObject    *object,
       g_value_set_int64 (value, self->timespan);
       break;
 
+    case PROP_RENDERER:
+      g_value_set_gtype (value, self->renderer);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -141,6 +147,10 @@ rg_cpu_graph_set_property (GObject      *object,
 
     case PROP_TIMESPAN:
       self->timespan = g_value_get_int64 (value);
+      break;
+
+    case PROP_RENDERER:
+      self->renderer = g_value_get_gtype (value);
       break;
 
     default:
@@ -173,6 +183,13 @@ rg_cpu_graph_class_init (RgCpuGraphClass *klass)
                        120,
                        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
+  properties [PROP_RENDERER] =
+    g_param_spec_gtype ("renderer",
+                       "Renderer",
+                       "Renderer to use",
+                       RG_TYPE_RENDERER,
+                       (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, LAST_PROP, properties);
 }
 
@@ -181,4 +198,5 @@ rg_cpu_graph_init (RgCpuGraph *self)
 {
   self->max_samples = 120;
   self->timespan = 60L * G_USEC_PER_SEC;
+  self->renderer = RG_TYPE_LINE_RENDERER;
 }
